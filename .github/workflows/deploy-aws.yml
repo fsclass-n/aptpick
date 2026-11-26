@@ -25,8 +25,8 @@ jobs:
     name: Preflight (tests · compose)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
           cache: pip
@@ -62,7 +62,7 @@ jobs:
             echo "### AWS EC2 배포 건너뜀 — GitHub Secrets 미설정" >> "$GITHUB_STEP_SUMMARY"
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.cfg.outputs.enabled == 'true'
       - name: Configure SSH key
         if: steps.cfg.outputs.enabled == 'true'
