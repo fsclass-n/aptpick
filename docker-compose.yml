@@ -1,0 +1,39 @@
+# 로컬 통합 실행: docker compose up --build
+#  - API:      http://localhost:8000/docs
+#  - Frontend: http://localhost:5173
+# AWS EC2: deploy/docker-compose.ec2.yml 로 오버라이드 (Nginx 리버스 프록시 뒤에서 127.0.0.1 바인딩)
+services:
+  api:
+    build: ./backend
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-}
+      FRONTEND_URL: http://localhost:5173
+      BACKEND_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - api-storage:/app/storage
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+        VITE_USE_MOCK: "false"
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  api-storage:

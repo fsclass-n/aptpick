@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "as_of": "2026-10-31",
+    "sources": [
+      {
+        "code": "sample",
+        "label": "aptpick 가상 샘플 데이터 (실제 실거래가 아님)"
+      }
+    ],
+    "is_sample": true,
+    "unit": "만원",
+    "basis": "실거래(계약일 기준, 해제 거래 제외)"
+  },
+  "train_rows": 3590,
+  "valid_rows": 333,
+  "valid_period": "2026-08 ~ 2026-10",
+  "features": [
+    "area",
+    "floor",
+    "age",
+    "log_households",
+    "lat",
+    "lng",
+    "d_subway",
+    "d_school",
+    "n_bus",
+    "n_mart",
+    "n_hospital",
+    "n_park",
+    "region_index",
+    "complex_premium",
+    "t"
+  ],
+  "results": [
+    {
+      "model": "HistGradientBoosting(운영)",
+      "mae": 4263.7,
+      "rmse": 7545.0,
+      "mape": 3.26,
+      "r2": 0.993,
+      "n": 333,
+      "seconds": 0.73
+    },
+    {
+      "model": "RandomForest",
+      "mae": 4738.6,
+      "rmse": 8174.5,
+      "mape": 3.53,
+      "r2": 0.9917,
+      "n": 333,
+      "seconds": 0.64
+    },
+    {
+      "model": "Ridge",
+      "mae": 4885.7,
+      "rmse": 8094.8,
+      "mape": 3.87,
+      "r2": 0.9919,
+      "n": 333,
+      "seconds": 0.02
+    },
+    {
+      "model": "baseline(지역지수+단지프리미엄)",
+      "mae": 5125.4,
+      "rmse": 8009.1,
+      "mape": 4.44,
+      "r2": 0.9921,
+      "n": 333,
+      "seconds": 0.0
+    }
+  ]
+}

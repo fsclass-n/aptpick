@@ -1,0 +1,112 @@
+# =============================================================
+# Render Blueprint (Infrastructure as Code)
+# - Render 대시보드 > New > Blueprint 에서 이 저장소를 한 번 연결하면,
+#   이후 main 브랜치 push 시 Render GitHub 연동 Auto-Deploy 로 배포됩니다. (Deploy Hook 미사용)
+# - autoDeployTrigger: checksPass → GitHub Actions(deploy-*.yml) 테스트·빌드 검증 통과 후에만 배포
+# - rootDir + buildFilter → 각 서비스 디렉터리가 변경될 때만 개별 배포 (Path Filtering)
+# - sync: false 항목은 Render 대시보드에서 직접 값을 입력합니다. (.env.example 의 [RENDER-*] 표시 참고)
+# =============================================================
+services:
+  # ---------- 백엔드 API: https://aptpick-api.onrender.com ----------
+  - type: web
+    name: aptpick-api
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - backend/**
+      ignoredPaths:
+        - backend/tests/**
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_ENV
+        value: production
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ADMIN_SECRET_KEY
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: TIDB_HOST
+        sync: false
+      - key: TIDB_PORT
+        value: "4000"
+      - key: TIDB_USER
+        sync: false
+      - key: TIDB_PASSWORD
+        sync: false
+      - key: TIDB_DATABASE
+        value: aptpick
+      - key: TIDB_SSL_MODE
+        value: VERIFY_IDENTITY
+      - key: CORS_ORIGINS
+        value: https://aptpick.onrender.com,https://aptpick.netlify.app,https://aptpick.duckdns.org,http://localhost:5173
+      - key: FRONTEND_URL
+        value: https://aptpick.onrender.com
+      - key: BACKEND_URL
+        value: https://aptpick-api.onrender.com
+      - key: SEED_SAMPLE_DATA
+        value: "true"
+      - key: DATA_GO_KR_API_KEY
+        sync: false
+      - key: KAKAO_REST_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: NAVER_CLIENT_ID
+        sync: false
+      - key: NAVER_CLIENT_SECRET
+        sync: false
+      - key: KAKAO_CLIENT_ID
+        sync: false
+      - key: KAKAO_CLIENT_SECRET
+        sync: false
+
+  # ---------- 프런트엔드: https://aptpick.onrender.com ----------
+  - type: web
+    name: aptpick
+    runtime: static
+    branch: main
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - frontend/**
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: VITE_USE_MOCK
+        value: "false"
+      - key: VITE_API_BASE_URL
+        value: https://aptpick-api.onrender.com
+      - key: VITE_MAP_PROVIDER
+        value: osm
+      - key: VITE_KAKAO_MAP_KEY
+        sync: false

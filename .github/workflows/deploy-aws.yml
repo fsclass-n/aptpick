@@ -1,0 +1,99 @@
+# =============================================================
+# AWS EC2 통합 배포 (https://aptpick.duckdns.org) — GitHub Actions SSH 배포
+# 필요한 GitHub Secrets (Settings > Secrets and variables > Actions):
+#   EC2_HOST, EC2_USER, EC2_SSH_KEY(개인키 전체), EC2_PORT(선택, 기본 22), EC2_PROJECT_PATH(선택, 기본 /opt/aptpick)
+# - Secrets 가 없으면 배포 단계를 건너뜁니다(실패 처리하지 않음 → Render checksPass 를 막지 않음)
+# - EC2 에서 deploy/remote-deploy.sh 가 릴리스 전환 → docker compose 빌드 → Health Check, 실패 시 자동 롤백
+# =============================================================
+name: Deploy AWS
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", "frontend/**", "deploy/**", "docker-compose.yml", ".github/workflows/deploy-aws.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aptpick-ec2-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Preflight (tests · compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r backend/requirements.txt
+      - name: Backend tests
+        working-directory: backend
+        run: python -m pytest -q
+      - name: Validate compose files
+        run: |
+          touch .env
+          APTPICK_ENV_FILE=.env docker compose -f docker-compose.yml -f deploy/docker-compose.ec2.yml config -q
+
+  deploy:
+    name: Deploy to EC2
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      HAS_KEY: ${{ secrets.EC2_SSH_KEY != '' }}
+      EC2_PORT: ${{ secrets.EC2_PORT || '22' }}
+      EC2_PROJECT_PATH: ${{ secrets.EC2_PROJECT_PATH || '/opt/aptpick' }}
+      RELEASE: ${{ github.sha }}
+    steps:
+      - name: Check secrets
+        id: cfg
+        run: |
+          if [ -n "$EC2_HOST" ] && [ -n "$EC2_USER" ] && [ "$HAS_KEY" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::EC2 Secrets(EC2_HOST/EC2_USER/EC2_SSH_KEY)가 설정되지 않아 AWS 배포를 건너뜁니다."
+            echo "### AWS EC2 배포 건너뜀 — GitHub Secrets 미설정" >> "$GITHUB_STEP_SUMMARY"
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.enabled == 'true'
+      - name: Configure SSH key
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/aptpick_ec2
+          chmod 600 ~/.ssh/aptpick_ec2
+          ssh-keyscan -p "$EC2_PORT" -H "$EC2_HOST" >> ~/.ssh/known_hosts
+      - name: Upload release
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          ssh -i ~/.ssh/aptpick_ec2 -p "$EC2_PORT" "$EC2_USER@$EC2_HOST" "mkdir -p '$EC2_PROJECT_PATH/releases/$RELEASE'"
+          rsync -az --delete --exclude '.git/' --exclude '.env' --exclude 'node_modules/' --exclude '.venv/' \
+            -e "ssh -i ~/.ssh/aptpick_ec2 -p $EC2_PORT" ./ "$EC2_USER@$EC2_HOST:$EC2_PROJECT_PATH/releases/$RELEASE/"
+      - name: Activate release (health check · rollback)
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          ssh -i ~/.ssh/aptpick_ec2 -p "$EC2_PORT" "$EC2_USER@$EC2_HOST" \
+            "PROJECT_DIR='$EC2_PROJECT_PATH' RELEASE='$RELEASE' bash '$EC2_PROJECT_PATH/releases/$RELEASE/deploy/remote-deploy.sh'"
+      - name: Public health check (https://aptpick.duckdns.org)
+        if: steps.cfg.outputs.enabled == 'true'
+        run: |
+          for i in $(seq 1 12); do
+            if body=$(curl -fsS --max-time 15 https://aptpick.duckdns.org/api/health); then
+              echo "$body"
+              echo "### AWS EC2: OK — $body" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::https://aptpick.duckdns.org/api/health 응답 없음 — Nginx·인증서·DuckDNS 상태를 확인하세요"
+          exit 1

@@ -1,0 +1,18 @@
+# AWS EC2 운영 오버라이드: 컨테이너는 127.0.0.1 에만 바인딩, 외부 80/443 은 호스트 Nginx 가 담당
+services:
+  api:
+    ports: !override
+      - "127.0.0.1:8000:8000"
+    env_file: !override
+      - ${APTPICK_ENV_FILE:-/etc/aptpick/aptpick.env}
+    environment:
+      FRONTEND_URL: https://aptpick.duckdns.org
+      BACKEND_URL: https://aptpick.duckdns.org
+      GIT_COMMIT: ${GIT_COMMIT:-}
+  web:
+    build:
+      args:
+        VITE_API_BASE_URL: ""
+        VITE_USE_MOCK: "false"
+    ports: !override
+      - "127.0.0.1:5173:80"

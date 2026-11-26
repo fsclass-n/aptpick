@@ -1,0 +1,25 @@
+{
+  "k": 10,
+  "method": "simulated personas (hidden utility)",
+  "algorithm": "recommend-weighted-v1",
+  "summary": {
+    "aptpick": {
+      "precision@10": 0.6826,
+      "recall@10": 0.6826,
+      "ndcg@10": 0.7354,
+      "personas": 23
+    },
+    "random": {
+      "precision@10": 0.4609,
+      "recall@10": 0.4609,
+      "ndcg@10": 0.4542,
+      "personas": 23
+    },
+    "cheapest": {
+      "precision@10": 0.4826,
+      "recall@10": 0.4826,
+      "ndcg@10": 0.48,
+      "personas": 23
+    }
+  }
+}

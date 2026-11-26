@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+# =============================================================
+# aptpick AI 실험·평가 전용 패키지 (운영 추론은 backend/requirements.txt 의 scikit-learn 사용)
+# 설치: .venv/Scripts/python -m pip install -r backend/requirements.txt -r ai/requirements.txt
+# - PyTorch 는 딥러닝 실험 시에만 별도 설치 (pip install torch) — 기본 파이프라인에서는 사용하지 않음
+# =============================================================
+xgboost==2.1.4
+lightgbm==4.6.0
+optuna==4.2.1
+shap==0.47.2
+matplotlib==3.10.1
+plotly==6.0.1

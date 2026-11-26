@@ -1,0 +1,71 @@
+# =============================================================
+# Frontend (React · Vite) — 빌드 검증 → Netlify / Render 자동 배포 → Health Check
+# - Netlify: GitHub 연동 자동 배포 (netlify.toml ignore 로 frontend 변경 시에만 빌드, Build Hook 미사용)
+# - Render Static: render.yaml autoDeployTrigger=checksPass → 이 워크플로 verify 통과 후 배포 (Deploy Hook 미사용)
+# - push 시에는 검증만 수행하고, 배포 상태 확인은 schedule / 수동 실행으로 수행 (checksPass 교착 방지)
+# =============================================================
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**", "netlify.toml", ".github/workflows/deploy-frontend.yml"]
+  pull_request:
+    branches: [main, dev]
+    paths: ["frontend/**", "netlify.toml", ".github/workflows/deploy-frontend.yml"]
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Frontend build
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Build (Render 프런트엔드 · 실제 API)
+        run: npm run build
+        env:
+          VITE_USE_MOCK: "false"
+          VITE_API_BASE_URL: https://aptpick-api.onrender.com
+      - name: Build (Netlify 데모 · Mock 데이터)
+        run: npm run build
+        env:
+          VITE_USE_MOCK: "true"
+
+  health:
+    name: Netlify / Render frontend health check
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployed frontends
+        run: |
+          fail=0
+          for url in https://aptpick.netlify.app https://aptpick.onrender.com; do
+            code=000
+            for i in $(seq 1 6); do
+              code=$(curl -s -o /tmp/page.html -w '%{http_code}' --max-time 30 "$url" || true)
+              [ "$code" = 200 ] && grep -q 'id="root"' /tmp/page.html && break
+              sleep 10
+            done
+            echo "- $url → HTTP $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" != 200 ]; then echo "::error::$url 응답 $code — 배포 로그를 확인하세요"; fail=1; fi
+          done
+          exit $fail

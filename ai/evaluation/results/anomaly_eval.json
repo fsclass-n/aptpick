@@ -1,0 +1,14 @@
+{
+  "labelled_anomalies": 43,
+  "transactions": 3966,
+  "robust_zscore": {
+    "flagged": 55,
+    "precision": 0.6545,
+    "recall": 0.8372
+  },
+  "isolation_forest": {
+    "flagged": 60,
+    "precision": 0.4167,
+    "recall": 0.5814
+  }
+}

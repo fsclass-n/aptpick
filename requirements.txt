@@ -1,0 +1,4 @@
+# -*- coding: utf-8 -*-
+# aptpick 루트 설치 파일 — 로컬 개발용 (배포 컨텍스트별 원본은 backend/requirements.txt)
+# AI 실험 패키지(XGBoost·LightGBM·Optuna·SHAP): pip install -r ai/requirements.txt
+-r backend/requirements.txt
