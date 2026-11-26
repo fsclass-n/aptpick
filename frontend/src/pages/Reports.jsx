@@ -8,6 +8,7 @@ import { Async, Badge, Card, Empty, PageHeader, Pagination, SampleBadge } from '
 import { useAuth } from '../contexts/AuthContext'
 import { useApi } from '../hooks/useApi'
 import { date } from '../utils/format'
+import { IMG } from '../utils/images'
 
 function Ask() {
   const { user } = useAuth()
@@ -47,7 +48,7 @@ export default function Reports() {
   const q = useApi('/api/reports', { kind, page, size: 9 })
   return (
     <>
-      <PageHeader eyebrow="AI Report" title="AI 부동산 분석 리포트" desc="검증된 실거래 통계를 Google Gemini 에 전달해 생성한 시장 분석 리포트입니다. Gemini 미연동 시 동일 구조의 규칙 기반 리포트를 제공합니다." />
+      <PageHeader eyebrow="AI Report" image={IMG.neon} title="AI 부동산 분석 리포트" desc="검증된 실거래 통계를 Google Gemini 에 전달해 생성한 시장 분석 리포트입니다. Gemini 미연동 시 동일 구조의 규칙 기반 리포트를 제공합니다." />
       <div className="container-x grid gap-6 py-6 lg:grid-cols-12">
         <section className="lg:col-span-8">
           <Async q={q}>

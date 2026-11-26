@@ -11,6 +11,7 @@ import { useToast } from '../contexts/ToastContext'
 import { clean, useApi } from '../hooks/useApi'
 import { DEAL_TYPES, READ_ONLY_MESSAGE, SORTS } from '../utils/config'
 import { date, eok, won } from '../utils/format'
+import { IMG } from '../utils/images'
 
 const LISTING_KEYS = ['q', 'region', 'deal_type', 'price_min', 'price_max', 'rent_max', 'area_min', 'area_max', 'build_year_min', 'rooms_min', 'sort', 'page']
 const TRADE_KEYS = ['q', 'region', 'price_min', 'price_max', 'area_min', 'area_max', 'date_from', 'date_to', 'page']
@@ -141,7 +142,7 @@ export default function Search() {
 
   return (
     <>
-      <PageHeader eyebrow="Search" title="아파트 찾기" desc="등록 매물(호가)과 국토교통부 실거래가(계약 완료 가격)를 구분해 검색합니다.">
+      <PageHeader eyebrow="Search" image={IMG.skyline} title="아파트 찾기" desc="등록 매물(호가)과 국토교통부 실거래가(계약 완료 가격)를 구분해 검색합니다.">
         <div className="flex flex-wrap gap-2">
           <Segmented value={tab} onChange={(v) => setSp(clean({ ...f, tab: v === 'trades' ? 'trades' : '', page: '' }))}
             options={[{ value: 'listings', label: '매물 (호가)' }, { value: 'trades', label: '실거래가' }]} />

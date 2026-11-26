@@ -7,6 +7,7 @@ import { useToast } from '../contexts/ToastContext'
 import { Card, Field, Segmented } from '../components/ui'
 import { LogoMark } from '../components/Logo'
 import { PASSWORD_RE, PASSWORD_RULE, USE_MOCK } from '../utils/config'
+import { IMG, unsplash } from '../utils/images'
 
 const OAUTH = [
   { id: 'kakao', label: '카카오로 시작하기', cls: 'bg-[#FEE500] text-[#191600] hover:brightness-95' },
@@ -56,19 +57,25 @@ export default function Login() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-brand-50 to-slate-50">
-      <div className="container-x grid gap-8 py-10 md:py-16 lg:grid-cols-12">
-        <div className="hidden lg:col-span-6 lg:flex lg:flex-col lg:justify-center">
-          <LogoMark size={56} />
-          <h1 className="h1 mt-6 text-[36px]!">데이터로 분석하고,<br />AI로 찾는 나에게 맞는 부동산</h1>
-          <p className="mt-4 max-w-md text-slate-600">로그인하면 관심 단지 저장, 가격 알림, AI 맞춤 추천 이력과 개인화 선호 조건을 이용할 수 있습니다.</p>
-          <ul className="mt-6 space-y-2 text-[15px] text-slate-600">
-            {['국토교통부 실거래가 기반 시장 분석', 'AI 적정가 추정과 예측 범위·모델 성능 공개', '예산·지역·교통·학군 맞춤 추천과 추천 근거'].map((t) => (
-              <li key={t} className="flex items-center gap-2"><ShieldCheck size={18} className="text-mint-500" />{t}</li>
+    <div className="grid min-h-[calc(100vh-72px)] lg:grid-cols-2">
+      <div className="relative hidden overflow-hidden bg-navy-900 lg:block">
+        <img src={unsplash(IMG.bedroom, 1400)} alt="" className="animate-ken absolute inset-0 h-full w-full object-cover opacity-75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/30 to-navy-950/20" />
+        <div className="absolute inset-x-0 bottom-0 p-12 xl:p-16">
+          <LogoMark size={48} light />
+          <h1 className="display mt-6 text-[44px]! text-white!">오늘의 생활이,<br />내일의 집이 됩니다.</h1>
+          <ul className="mt-6 space-y-2 text-[15px] text-white/80">
+            {['라이프스타일 페르소나 기반 AI 맞춤 추천', '국토교통부 실거래가 기반 시장 분석', '관심 단지 저장 · 목표가 도달 알림'].map((t) => (
+              <li key={t} className="flex items-center gap-2"><ShieldCheck size={18} className="text-brand-300" />{t}</li>
             ))}
           </ul>
+          <p className="mt-8 text-[11px] text-white/50">참고 이미지 (Unsplash)</p>
         </div>
-        <Card className="mx-auto w-full max-w-md p-6 md:p-8 lg:col-span-5 lg:col-start-8">
+      </div>
+      <div className="flex items-center justify-center px-5 py-10 md:py-16">
+        <Card className="w-full max-w-md border-0! bg-transparent! p-0 shadow-none! md:p-2">
+          <p className="eyebrow mb-2">Welcome</p>
+          <h2 className="h1 mb-6">{mode === 'login' ? '다시 오신 걸 환영해요' : 'aptpick 시작하기'}</h2>
           {params.get('error') && <p className="mb-4 rounded-xl bg-warn-soft px-3 py-2 text-[13px] text-warn">{ERRORS[params.get('error')] || '로그인 오류'}</p>}
           <Segmented value={mode} onChange={setMode} options={[{ value: 'login', label: '로그인' }, { value: 'signup', label: '회원가입' }]} />
           <form onSubmit={submit} className="mt-5 space-y-3">
@@ -84,8 +91,9 @@ export default function Login() {
           <div className="space-y-2">
             {OAUTH.map((o) => <button key={o.id} type="button" onClick={() => oauth(o.id)} className={`btn w-full ${o.cls}`}>{o.label}</button>)}
           </div>
-          <div className="mt-6 rounded-xl bg-slate-50 p-3">
-            <p className="caption mb-2 font-semibold">체험용 계정</p>
+          <div className="mt-6 rounded-2xl border border-line bg-white p-4">
+            <p className="mb-1 font-display text-[15px] font-bold">체험용 계정으로 둘러보기</p>
+            <p className="caption mb-3">회원가입 없이 바로 이용해 보세요.</p>
             <div className="grid grid-cols-2 gap-2">
               <button type="button" className="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => run('user', () => api.post('/api/auth/test-login', { kind: 'user' }))}>
                 <UserRound size={15} />테스트 사용자

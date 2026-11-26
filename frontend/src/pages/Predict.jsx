@@ -6,6 +6,7 @@ import { RegionSelect } from '../components/SearchForm'
 import { Async, Badge, Card, DataMeta, Empty, Field, PageHeader, SampleBadge, Skeleton, Stat } from '../components/ui'
 import { useApi } from '../hooks/useApi'
 import { date, eok, num, pct, won } from '../utils/format'
+import { IMG } from '../utils/images'
 
 const FEATURE_LABEL = { area: '전용면적', floor: '층', age: '경과연수', log_households: '세대수', lat: '위도', lng: '경도', d_subway: '지하철 거리', d_school: '학교 거리',
   n_bus: '버스정류장 수', n_mart: '마트 수', n_hospital: '병원 수', n_park: '공원 수', region_index: '지역 시세지수', complex_premium: '단지 프리미엄', t: '시점' }
@@ -47,7 +48,7 @@ export default function Predict() {
   const d = q.data
   return (
     <>
-      <PageHeader eyebrow="AI Price Estimation" title="AI 아파트 가격 예측" desc="과거 실거래 데이터를 학습한 머신러닝 모델이 적정가와 예측 범위를 추정합니다. 결과는 미래 시세를 보장하지 않는 참고용 통계 추정치입니다." />
+      <PageHeader eyebrow="AI Price Estimation" image={IMG.keys} title="AI 아파트 가격 예측" desc="과거 실거래 데이터를 학습한 머신러닝 모델이 적정가와 예측 범위를 추정합니다. 결과는 미래 시세를 보장하지 않는 참고용 통계 추정치입니다." />
       <div className="container-x space-y-6 py-6">
         <Picker current={d?.apartment} />
         {!apartmentId && <Card><Empty icon={Brain} title="지역 · 단지 · 평형을 선택하면 AI 추정 결과가 표시됩니다." /></Card>}

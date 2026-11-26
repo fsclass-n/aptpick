@@ -9,6 +9,7 @@ import { useToast } from '../contexts/ToastContext'
 import { useApi } from '../hooks/useApi'
 import { DEAL_LABEL } from '../utils/config'
 import { date, dealPrice, ratio, won } from '../utils/format'
+import { IMG } from '../utils/images'
 
 export default function Favorites() {
   const { readOnly } = useAuth()
@@ -26,7 +27,7 @@ export default function Favorites() {
   }
   return (
     <>
-      <PageHeader eyebrow="My Picks" title="관심 매물" desc="저장한 관심 단지·매물의 최근 시세와 가격 알림을 한 곳에서 관리합니다." />
+      <PageHeader eyebrow="My Picks" image={IMG.bedroom} title="관심 매물" desc="저장한 관심 단지·매물의 최근 시세와 가격 알림을 한 곳에서 관리합니다." />
       <div className="container-x grid gap-6 py-6 lg:grid-cols-12">
         <section className="lg:col-span-8">
           {readOnly && <ReadOnlyNotice />}

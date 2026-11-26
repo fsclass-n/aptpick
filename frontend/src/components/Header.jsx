@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { Bell, ChevronDown, LogIn, LogOut, Menu, Shield, User, X } from 'lucide-react'
+import { ArrowRight, Bell, ChevronDown, Eye, LogIn, LogOut, Menu, Search, Shield, User, X } from 'lucide-react'
 import Logo from './Logo'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
@@ -10,31 +10,58 @@ import { api } from '../api/client'
 import { connectNotifications } from '../services/realtime'
 import { ROLE_LABEL, USE_MOCK } from '../utils/config'
 import { datetime } from '../utils/format'
+import { PERSONAS } from '../utils/lifestyle'
+import { unsplash } from '../utils/images'
 
 export const NAV = [
   { to: '/', label: '홈', end: true },
   { to: '/search', label: '아파트 찾기', children: [
     { to: '/search', label: '매물 통합 검색' }, { to: '/map', label: '지도로 탐색' }, { to: '/search?tab=trades', label: '실거래가 조회' }] },
-  { to: '/market', label: '부동산 시장 분석', children: [
+  { to: '/recommend', label: 'Life Pick', mega: true, children: [{ to: '/recommend', label: '조건 직접 설정' }] },
+  { to: '/market', label: '시장 분석', children: [
     { to: '/market', label: '지역별 시장 동향' }, { to: '/predict', label: 'AI 가격 예측' }] },
-  { to: '/recommend', label: 'AI 맞춤 추천' },
+  { to: '/reports', label: '리포트' },
   { to: '/favorites', label: '관심 매물' },
-  { to: '/reports', label: '부동산 리포트' },
 ]
+
+// Life Pick 메가 메뉴: 라이프스타일 페르소나별 AI 추천 바로가기
+function MegaMenu() {
+  return (
+    <div className="invisible absolute top-full left-1/2 z-50 w-[720px] -translate-x-1/2 translate-y-1 rounded-3xl border border-line bg-white p-5 opacity-0 shadow-float transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+      <div className="mb-3 flex items-end justify-between">
+        <div><p className="eyebrow">Life Pick</p><p className="font-display text-[17px] font-bold">나의 라이프스타일로 집 찾기</p></div>
+        <Link to="/recommend" className="inline-flex items-center gap-1 text-[13px] font-semibold text-slate-500 hover:text-navy-900">조건 직접 설정<ArrowRight size={14} /></Link>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {PERSONAS.map((p) => (
+          <Link key={p.id} to={`/recommend?persona=${p.id}`} className="group/p relative h-24 overflow-hidden rounded-2xl">
+            <img src={unsplash(p.img, 360, 200)} alt="" className="h-full w-full object-cover transition duration-500 group-hover/p:scale-105" loading="lazy" />
+            <span className="scrim absolute inset-0" />
+            <span className="absolute bottom-2 left-3 text-[14px] font-bold text-white">{p.title}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function NavItem({ item }) {
   const location = useLocation()
   const active = item.end ? location.pathname === '/' : (item.children || [item]).some((c) => location.pathname.startsWith(c.to.split('?')[0]))
-  const cls = `flex h-16 items-center gap-1 px-3 text-[15px] font-semibold transition xl:px-4 ${active ? 'text-brand-600' : 'text-slate-600 hover:text-slate-900'}`
-  if (!item.children) return <NavLink to={item.to} end={item.end} className={cls}>{item.label}</NavLink>
+  const cls = `flex h-[72px] items-center gap-1 px-3 text-[15px] font-semibold tracking-tight transition xl:px-4 ${active ? 'text-navy-900' : 'text-slate-500 hover:text-navy-900'}`
+  const text = <span className={`link-line py-1 ${active ? 'active' : ''}`}>{item.label}</span>
+  if (!item.children) return <NavLink to={item.to} end={item.end} className={cls}>{text}</NavLink>
   return (
     <div className="group relative">
-      <Link to={item.to} className={cls}>{item.label}<ChevronDown size={14} className="opacity-50 transition group-hover:rotate-180" /></Link>
-      <div className="invisible absolute top-full left-1/2 z-50 w-48 -translate-x-1/2 translate-y-1 rounded-xl border border-slate-200 bg-white p-1.5 opacity-0 shadow-float transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+      <Link to={item.to} className={cls}>
+        {item.mega && <span className="mr-0.5 h-1.5 w-1.5 rounded-full bg-brand-500" />}
+        {text}<ChevronDown size={14} className="opacity-40 transition group-hover:rotate-180" />
+      </Link>
+      {item.mega ? <MegaMenu /> : <div className="invisible absolute top-full left-1/2 z-50 w-48 -translate-x-1/2 translate-y-1 rounded-2xl border border-line bg-white p-1.5 opacity-0 shadow-float transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
         {item.children.map((c) => (
-          <Link key={c.to} to={c.to} className="block rounded-lg px-3 py-2 text-[14px] text-slate-600 hover:bg-brand-50 hover:text-brand-700">{c.label}</Link>
+          <Link key={c.to} to={c.to} className="block rounded-lg px-3 py-2 text-[14px] text-slate-600 hover:bg-slate-50 hover:text-navy-900">{c.label}</Link>
         ))}
-      </div>
+      </div>}
     </div>
   )
 }
@@ -103,7 +130,7 @@ function ProfileMenu() {
   return (
     <div className="relative" ref={ref}>
       <button className="flex items-center gap-2 rounded-xl py-1.5 pr-2 pl-1.5 hover:bg-slate-100" onClick={() => setOpen((o) => !o)}>
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-[13px] font-bold text-white">{user.name.slice(0, 1)}</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-navy-900 text-[13px] font-bold text-white">{user.name.slice(0, 1)}</span>
         <span className="hidden max-w-24 truncate text-[14px] font-semibold text-slate-700 lg:block">{user.name}</span>
         <ChevronDown size={14} className="text-slate-400" />
       </button>
@@ -141,7 +168,7 @@ function MobileDrawer({ open, onClose }) {
         <div className="border-b border-slate-100 p-4">
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 font-bold text-white">{user.name.slice(0, 1)}</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-900 font-bold text-white">{user.name.slice(0, 1)}</span>
               <div className="min-w-0"><p className="font-semibold">{user.name}</p><p className="caption truncate">{ROLE_LABEL[user.role]}</p></div>
             </div>
           ) : <Link to="/login" className="btn btn-primary w-full"><LogIn size={16} />로그인 / 회원가입</Link>}
@@ -155,11 +182,35 @@ function MobileDrawer({ open, onClose }) {
               ))}
             </div>
           ))}
+          <div className="mt-2 rounded-2xl bg-slate-50 p-3">
+            <p className="eyebrow mb-2">Life Pick</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {PERSONAS.map((p) => <Link key={p.id} to={`/recommend?persona=${p.id}`} className="rounded-xl bg-white px-3 py-2 text-[13px] font-semibold text-slate-700">{p.title}</Link>)}
+            </div>
+          </div>
           {user && <Link to="/mypage" className="block rounded-xl px-3 py-3 text-[16px] font-semibold text-slate-800 hover:bg-slate-50">마이페이지</Link>}
           {isAdmin && <Link to="/admin" className="block rounded-xl px-3 py-3 text-[16px] font-semibold text-brand-700 hover:bg-brand-50">관리자 대시보드</Link>}
         </nav>
         {user && <button onClick={logout} className="m-4 btn btn-secondary"><LogOut size={16} />로그아웃</button>}
       </aside>
+    </div>
+  )
+}
+
+// 상단 유틸리티 바 (데스크톱 · sticky 헤더 바깥에서 자연 스크롤)
+export function UtilityBar() {
+  const { user } = useAuth()
+  return (
+    <div className="hidden border-b border-line/70 bg-ivory lg:block">
+      <div className="container-x flex h-9 items-center justify-between text-[12px] text-slate-500">
+        <p><span className="font-semibold text-navy-900">공공 실거래 데이터 × AI 라이프 매칭</span> · 나의 생활 방식에 맞는 집을 고르는 가장 쉬운 방법</p>
+        <div className="flex items-center gap-4">
+          <Link to="/about" className="hover:text-navy-900">서비스 소개</Link>
+          <Link to="/policy/data" className="hover:text-navy-900">데이터 출처</Link>
+          {user ? <span>{user.name}님 · {ROLE_LABEL[user.role]}</span>
+            : <Link to="/login" className="inline-flex items-center gap-1 font-semibold text-navy-900 hover:text-brand-600"><Eye size={13} />테스트 관리자 체험</Link>}
+        </div>
+      </div>
     </div>
   )
 }
@@ -176,18 +227,19 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   return (
-    <header className={`sticky top-0 z-[1000] border-b bg-white/90 backdrop-blur transition ${scrolled ? 'border-slate-200 shadow-sm' : 'border-transparent'}`}>
+    <header className={`sticky top-0 z-[1000] border-b bg-ivory/90 backdrop-blur-md transition ${scrolled ? 'border-line' : 'border-transparent'}`}>
       {USE_MOCK && (
-        <div className="bg-navy-900 px-4 py-1.5 text-center text-[12px] text-slate-200">
-          Netlify 데모 — 브라우저 Mock 데이터(가상 샘플)로 동작합니다. 실서비스: <a className="font-semibold text-mint-300 underline" href="https://aptpick.onrender.com">aptpick.onrender.com</a>
+        <div className="bg-navy-900 px-4 py-1.5 text-center text-[12px] text-slate-300">
+          Netlify 데모 — 브라우저 Mock 데이터(가상 샘플)로 동작합니다. 실서비스: <a className="font-semibold text-brand-300 underline" href="https://aptpick.onrender.com">aptpick.onrender.com</a>
         </div>
       )}
-      <div className="container-x flex h-16 items-center justify-between gap-4">
+      <div className="container-x flex h-[72px] items-center justify-between gap-4">
         <Logo />
         <nav className="hidden items-center lg:flex" aria-label="주 메뉴">
           {NAV.map((item) => <NavItem key={item.label} item={item} />)}
         </nav>
         <div className="flex items-center gap-1">
+          <Link to="/search" className="btn btn-ghost h-10 w-10 px-0" aria-label="검색"><Search size={19} /></Link>
           {user && <Notifications />}
           {isAdmin && (
             <Link to="/admin" className={`btn btn-sm hidden md:inline-flex ${location.pathname.startsWith('/admin') ? 'bg-navy-900 text-white' : 'btn-secondary'}`}>

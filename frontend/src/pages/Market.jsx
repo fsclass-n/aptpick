@@ -7,6 +7,7 @@ import { Async, Badge, Card, DataMeta, PageHeader, Segmented, Skeleton, Stat, Tr
 import { useDashboardTheme } from '../contexts/ThemeContext'
 import { useApi } from '../hooks/useApi'
 import { num, pct, period, ratio, won } from '../utils/format'
+import { IMG } from '../utils/images'
 
 const short = (name) => name.split(' ').slice(-1)[0]
 
@@ -113,7 +114,7 @@ export default function Market() {
   return (
     <div className={dark ? 'dark' : ''}>
       <div className="min-h-screen bg-slate-50 dark:bg-navy-950 dark:text-slate-200">
-        <PageHeader eyebrow="Market Analysis" title="부동산 시장 분석" desc="실거래 데이터 기반 지역별 가격·거래량·전세가율·변동성 분석. 모든 통계는 데이터 기준일과 출처를 함께 표시합니다.">
+        <PageHeader eyebrow="Market Analysis" image={IMG.street} title="부동산 시장 분석" desc="실거래 데이터 기반 지역별 가격·거래량·전세가율·변동성 분석. 모든 통계는 데이터 기준일과 출처를 함께 표시합니다.">
           <div className="flex gap-2">
             <Link to="/predict" className="btn btn-mint btn-sm"><TrendingUp size={15} />AI 가격 예측</Link>
             <button className="btn btn-secondary btn-sm" onClick={toggle} aria-label="다크 테마 전환">{dark ? <Sun size={15} /> : <Moon size={15} />}{dark ? '라이트' : '다크'}</button>

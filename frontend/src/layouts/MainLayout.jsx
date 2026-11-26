@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import Header from '../components/Header'
+import Header, { UtilityBar } from '../components/Header'
 import Footer from '../components/Footer'
 import ToTop from '../components/ToTop'
 import { Spinner } from '../components/ui'
@@ -11,6 +11,7 @@ export default function MainLayout() {
   const fullBleed = pathname === '/map'
   return (
     <div className="flex min-h-screen flex-col">
+      {!fullBleed && <UtilityBar />}
       <Header />
       <main className="flex-1">
         <Suspense fallback={<Spinner />}><Outlet /></Suspense>

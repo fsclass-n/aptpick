@@ -81,7 +81,7 @@ export default function ApartmentDetail() {
   const typeId = Number(sp.get('type')) || d?.types[0]?.id
   const type = d?.types.find((t) => t.id === typeId) || d?.types[0]
   const series = useMemo(() => (d && type ? d.series[type.id] || [] : []), [d, type])
-  const markers = useMemo(() => (d ? [{ id: d.complex.id, kind: 'apt', lat: d.complex.lat, lng: d.complex.lng, color: '#1f4bc9', active: true, label: d.complex.name.slice(0, 8) }] : []), [d])
+  const markers = useMemo(() => (d ? [{ id: d.complex.id, kind: 'apt', lat: d.complex.lat, lng: d.complex.lng, color: '#c2653a', active: true, label: d.complex.name.slice(0, 8) }] : []), [d])
   const openAlert = () => {
     if (!user) return navigate(`/login?next=/apartments/${id}`)
     if (readOnly) return toast(READ_ONLY_MESSAGE, 'error')
@@ -95,7 +95,7 @@ export default function ApartmentDetail() {
         <>
           <section className="border-b border-slate-200 bg-white">
             <div className="container-x grid gap-6 py-6 md:grid-cols-12 md:py-8">
-              <AptVisual id={d.complex.id} floors={d.complex.max_floor} className="h-44 rounded-2xl md:col-span-4 md:h-full" label="단지 일러스트 (실제 사진 아님)" />
+              <AptVisual id={d.complex.id} floors={d.complex.max_floor} className="h-56 rounded-2xl md:col-span-4 md:h-full md:min-h-64" label="참고 이미지 · 실제 단지 사진 아님" width={1000} />
               <div className="md:col-span-8">
                 <div className="flex flex-wrap gap-1.5">
                   {d.complex.source === 'sample' ? <SampleBadge /> : <Badge tone="brand">국토교통부 실거래 단지</Badge>}

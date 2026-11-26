@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle, ChevronLeft, ChevronRight, Database, Inbox, Loader2, X } from 'lucide-react'
 import { date, pct, trendArrow, trendClass } from '../utils/format'
+import { unsplash } from '../utils/images'
 
 export function Spinner({ label = '불러오는 중…', className = '' }) {
   return (
@@ -59,15 +60,34 @@ export function SectionTitle({ eyebrow, title, desc, action, className = '' }) {
   )
 }
 
-export function PageHeader({ eyebrow, title, desc, children }) {
+/** 페이지 상단 헤더 — image(Unsplash id) 지정 시 사진 밴드 + 스크림, 미지정 시 아이보리 에디토리얼 헤더 */
+export function PageHeader({ eyebrow, title, desc, children, image }) {
+  if (image) {
+    return (
+      <div className="relative overflow-hidden bg-navy-900">
+        <img src={unsplash(image, 1800, 520)} alt="" className="animate-ken absolute inset-0 h-full w-full object-cover opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-950/85 via-navy-950/55 to-navy-950/10" />
+        <div className="container-x relative py-12 md:py-16">
+          {eyebrow && <p className="mb-3 text-[12px] font-bold tracking-[0.18em] text-brand-300 uppercase">{eyebrow}</p>}
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 className="h1 text-white!">{title}</h1>
+              {desc && <p className="mt-3 max-w-2xl text-[15px] leading-7 text-white/75">{desc}</p>}
+            </div>
+            {children}
+          </div>
+        </div>
+      </div>
+    )
+  }
   return (
-    <div className="border-b border-slate-200 bg-white dark:border-navy-800 dark:bg-navy-900">
-      <div className="container-x py-8 md:py-10">
-        {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
+    <div className="border-b border-line bg-ivory dark:border-navy-800 dark:bg-navy-900">
+      <div className="container-x py-10 md:py-14">
+        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="h1">{title}</h1>
-            {desc && <p className="mt-2 max-w-3xl text-[15px] text-slate-500 dark:text-slate-400">{desc}</p>}
+            {desc && <p className="mt-3 max-w-3xl text-[15px] leading-7 text-slate-500 dark:text-slate-400">{desc}</p>}
           </div>
           {children}
         </div>
@@ -128,11 +148,11 @@ export function SampleBadge({ className = '' }) {
 
 export function Segmented({ options, value, onChange, size = 'md' }) {
   return (
-    <div className="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-navy-800" role="tablist">
+    <div className="inline-flex rounded-full bg-slate-100 p-1 dark:bg-navy-800" role="tablist">
       {options.map((o) => (
         <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)}
-          className={`rounded-lg font-semibold transition ${size === 'sm' ? 'px-2.5 py-1 text-[13px]' : 'px-3.5 py-1.5 text-[14px]'} ${value === o.value
-            ? 'bg-white text-brand-700 shadow-sm dark:bg-navy-600 dark:text-white' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'}`}>
+          className={`rounded-full font-semibold transition ${size === 'sm' ? 'px-2.5 py-1 text-[13px]' : 'px-3.5 py-1.5 text-[14px]'} ${value === o.value
+            ? 'bg-white text-navy-900 shadow-sm dark:bg-navy-600 dark:text-white' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'}`}>
           {o.label}
         </button>
       ))}
@@ -150,7 +170,7 @@ export function Pagination({ page, pages, onChange }) {
       <button className={`${btn} btn-ghost`} disabled={page <= 1} onClick={() => onChange(page - 1)} aria-label="이전"><ChevronLeft size={16} /></button>
       {list.map((p) => (
         <button key={p} onClick={() => onChange(p)} aria-current={p === page}
-          className={`${btn} ${p === page ? 'bg-brand-600 text-white' : 'btn-ghost'}`}>{p}</button>
+          className={`${btn} ${p === page ? 'bg-navy-900 text-white' : 'btn-ghost'}`}>{p}</button>
       ))}
       <button className={`${btn} btn-ghost`} disabled={page >= pages} onClick={() => onChange(page + 1)} aria-label="다음"><ChevronRight size={16} /></button>
     </nav>

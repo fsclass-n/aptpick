@@ -28,11 +28,11 @@ export default function SearchForm({ initial = {}, onSubmit, variant = 'hero' })
   const set = (k) => (v) => setF((s) => ({ ...s, [k]: v?.target ? v.target.value : v }))
   const hero = variant === 'hero'
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(f) }} className={hero ? 'rounded-2xl bg-white p-3 shadow-float md:p-4' : ''}>
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit(f) }} className={hero ? 'rounded-3xl bg-white p-4 shadow-float md:p-5' : ''}>
       <div className="mb-3 flex gap-1.5">
         {DEAL_TYPES.map((d) => (
           <button type="button" key={d.value} onClick={() => set('deal_type')(d.value)}
-            className={`chip px-3.5! py-1.5! text-[14px]! ${f.deal_type === d.value ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{d.label}</button>
+            className={`chip px-3.5! py-1.5! text-[14px]! ${f.deal_type === d.value ? 'bg-navy-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{d.label}</button>
         ))}
       </div>
       <div className="grid gap-2 md:grid-cols-12">
@@ -59,7 +59,7 @@ export default function SearchForm({ initial = {}, onSubmit, variant = 'hero' })
             {YEAR_OPTIONS.map((y) => <option key={y} value={y || ''}>{y ? `${y}년 이후 준공` : '준공 연도 전체'}</option>)}
           </select>
         </div>
-        <button className="btn btn-primary md:col-span-4"><Search size={18} />매물 검색</button>
+        <button className="btn btn-accent md:col-span-4"><Search size={18} />매물 검색</button>
       </div>
     </form>
   )

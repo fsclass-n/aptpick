@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { Brain, CheckCircle2, Home as HomeIcon, Sparkles, TrendingUp, TriangleAlert } from 'lucide-react'
 import { api } from '../api/client'
@@ -10,18 +10,39 @@ import { useAuth } from '../contexts/AuthContext'
 import { useApi } from '../hooks/useApi'
 import { DEAL_LABEL, DEAL_TYPES } from '../utils/config'
 import { dealPrice, eok, won } from '../utils/format'
+import { IMG, unsplash } from '../utils/images'
+import { PERSONAS, lifeTags, personaById } from '../utils/lifestyle'
 
 const DEFAULT = { region_codes: [], deal_type: 'sale', budget_min: '', budget_max: 150000, monthly_max: '', area_min: 59, area_max: '', rooms_min: '', build_year_min: '',
   transport_weight: 3, school_weight: 3, infra_weight: 3, purpose: 'residence' }
 const COMPONENT_LABEL = { budget: '예산 적합도', region: '지역 적합도', transport: '교통 접근성', school: '학군', infra: '생활 인프라', price: '가격 경쟁력', momentum: '시세 흐름', liquidity: '거래 활발도', stability: '가격 안정성' }
 const STEPS = ['조건 수집', '매물 필터링', '예산·지역 적합도', '입지·인프라 분석', '가격 경쟁력', '선호 가중치 적용', '추천 점수 산출', '최종 추천']
-const num = (v) => (v === '' || v === null ? null : Number(v))
+const num = (v) => (v === '' || v === null || v === undefined ? null : Number(v))
+const toBody = (f, save) => ({ ...f, budget_min: num(f.budget_min), budget_max: num(f.budget_max), monthly_max: num(f.monthly_max), area_min: num(f.area_min), area_max: num(f.area_max),
+  rooms_min: num(f.rooms_min), build_year_min: num(f.build_year_min), top_k: 10, save_preference: save })
+
+// Life Pick 페르소나 선택 스트립 (선택 시 조건 프리셋 적용 후 즉시 추천)
+function PersonaStrip({ active, onPick }) {
+  return (
+    <div className="scrollbar-none -mx-5 flex gap-3 overflow-x-auto px-5 md:mx-0 md:grid md:grid-cols-6 md:px-0">
+      {PERSONAS.map(({ id, title, icon: Icon, img }) => (
+        <button key={id} type="button" onClick={() => onPick(id)} aria-pressed={active === id}
+          className={`group relative h-24 w-36 shrink-0 overflow-hidden rounded-2xl text-left ring-offset-2 ring-offset-ivory transition md:w-auto ${active === id ? 'ring-2 ring-brand-500' : 'opacity-85 hover:opacity-100'}`}>
+          <img src={unsplash(img, 360, 220)} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+          <span className="scrim absolute inset-0" />
+          <span className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-navy-900"><Icon size={14} /></span>
+          <span className="absolute bottom-2 left-3 text-[14px] font-bold text-white">{title}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
 
 function Weight({ label, value, onChange }) {
   return (
     <label className="block">
       <span className="label flex justify-between"><span>{label}</span><span className="num text-brand-600">{['', '낮음', '조금', '보통', '중요', '매우 중요'][value]}</span></span>
-      <input type="range" min="1" max="5" value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-brand-600" />
+      <input type="range" min="1" max="5" value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-brand-500" />
     </label>
   )
 }
@@ -40,6 +61,7 @@ function ResultCard({ r, rank }) {
               <div className="flex flex-wrap gap-1.5"><Badge tone="brand">{DEAL_LABEL[r.deal_type]}</Badge>{r.source === 'sample' && <Badge tone="warn">샘플</Badge>}</div>
               <Link to={`/apartments/${r.complex_id}?type=${r.apartment_id}`} className="mt-1 block truncate font-display text-[19px] font-bold hover:text-brand-600">{r.complex_name}</Link>
               <p className="caption">{r.region} · {r.type_name} {r.area}㎡ · 방 {r.rooms} · {r.floor}층 · {r.build_year}년</p>
+              {lifeTags(r.components).length > 0 && <div className="mt-2 flex flex-wrap gap-1">{lifeTags(r.components).map((t) => <span key={t} className="chip bg-mint-50 text-mint-600">#{t}</span>)}</div>}
             </div>
             <div className="text-right">
               <p className="caption">추천 점수</p>
@@ -77,30 +99,47 @@ function ResultCard({ r, rank }) {
 
 export default function Recommend() {
   const { user } = useAuth()
+  const [params, setParams] = useSearchParams()
+  const persona = personaById(params.get('persona'))
   const pref = useApi(user?.role === 'user' ? '/api/me/preferences' : null)
   const regions = useApi('/api/regions')
   const [f, setF] = useState(DEFAULT)
   const [save, setSave] = useState(false)
   const m = useMutation({ mutationFn: (body) => api.post('/api/ai/recommend', body) })
   useEffect(() => {
-    if (pref.data) setF((s) => ({ ...s, ...Object.fromEntries(Object.entries(pref.data).filter(([k, v]) => k in DEFAULT && v !== null)) }))
-  }, [pref.data])
+    if (pref.data && !persona) setF((s) => ({ ...s, ...Object.fromEntries(Object.entries(pref.data).filter(([k, v]) => k in DEFAULT && v !== null)) }))
+  }, [pref.data]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!persona) return
+    const next = { ...DEFAULT, ...persona.cond }
+    setF(next)
+    m.mutate(toBody(next, false))
+  }, [persona?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const set = (k) => (v) => setF((s) => ({ ...s, [k]: v?.target ? v.target.value : v }))
   const toggleRegion = (code) => setF((s) => ({ ...s, region_codes: s.region_codes.includes(code) ? s.region_codes.filter((c) => c !== code) : [...s.region_codes, code].slice(0, 5) }))
   const submit = (e) => {
     e?.preventDefault()
-    m.mutate({ ...f, budget_min: num(f.budget_min), budget_max: num(f.budget_max), monthly_max: num(f.monthly_max), area_min: num(f.area_min), area_max: num(f.area_max),
-      rooms_min: num(f.rooms_min), build_year_min: num(f.build_year_min), top_k: 10, save_preference: save })
+    m.mutate(toBody(f, save))
   }
   const withData = (regions.data || []).filter((r) => r.complexes > 0)
 
   return (
     <>
-      <PageHeader eyebrow="AI Recommendation" title="AI 맞춤형 매물 추천" desc="예산·지역·면적과 교통·학군·생활 인프라 중요도, 실거주/투자 목적을 반영해 매물별 추천 점수와 근거를 제공합니다." />
+      <PageHeader eyebrow="Life Pick · AI Recommendation" image={persona?.img || IMG.living}
+        title={persona ? `${persona.label || persona.title} 맞춤 추천` : 'AI 맞춤형 매물 추천'}
+        desc={persona ? `${persona.tagline} — ${persona.focus.map((x) => `#${x}`).join(' ')} 중심으로 조건을 미리 채웠습니다. 왼쪽에서 자유롭게 조정할 수 있습니다.`
+          : '라이프스타일을 고르거나 예산·지역·면적과 교통·학군·생활 인프라 중요도를 직접 설정하면 매물별 추천 점수와 근거를 제공합니다.'} />
+      <div className="container-x pt-6">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <p className="font-display text-[17px] font-bold">라이프스타일로 시작하기</p>
+          {persona && <button type="button" className="caption font-semibold hover:text-navy-900" onClick={() => { setParams({}); setF(DEFAULT); m.reset() }}>선택 해제</button>}
+        </div>
+        <PersonaStrip active={persona?.id} onPick={(id) => setParams({ persona: id })} />
+      </div>
       <div className="container-x grid gap-6 py-6 lg:grid-cols-12">
         <form onSubmit={submit} className="lg:col-span-4">
           <Card className="space-y-4 p-5 lg:sticky lg:top-24">
-            <div className="flex items-center justify-between"><h2 className="h3">내 조건</h2>{pref.data && <Badge tone="mint">저장된 선호 조건 적용</Badge>}</div>
+            <div className="flex items-center justify-between"><h2 className="h3">내 조건</h2>{persona ? <Badge tone="brand">{persona.title} 프리셋</Badge> : pref.data && <Badge tone="mint">저장된 선호 조건 적용</Badge>}</div>
             <Field label="목적">
               <Segmented value={f.purpose} onChange={set('purpose')} options={[{ value: 'residence', label: <span className="flex items-center gap-1"><HomeIcon size={14} />실거주</span> }, { value: 'investment', label: <span className="flex items-center gap-1"><TrendingUp size={14} />투자</span> }]} />
             </Field>
@@ -111,7 +150,7 @@ export default function Recommend() {
               <div className="flex max-h-40 flex-wrap gap-1.5 overflow-y-auto">
                 {withData.map((r) => (
                   <button type="button" key={r.code} onClick={() => toggleRegion(r.code)}
-                    className={`chip ${f.region_codes.includes(r.code) ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{r.sigungu}</button>
+                    className={`chip ${f.region_codes.includes(r.code) ? 'bg-navy-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{r.sigungu}</button>
                 ))}
               </div>
             </Field>
@@ -140,7 +179,7 @@ export default function Recommend() {
             <Card className="p-6">
               <h2 className="h3 mb-4 flex items-center gap-2"><Brain size={18} className="text-brand-600" />추천 알고리즘</h2>
               <ol className="grid gap-2 sm:grid-cols-2">
-                {STEPS.map((s, i) => <li key={s} className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 text-[14px]"><span className="num flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-[13px] font-bold text-white">{i + 1}</span>{s}</li>)}
+                {STEPS.map((s, i) => <li key={s} className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 text-[14px]"><span className="num flex h-7 w-7 items-center justify-center rounded-full bg-navy-900 text-[13px] font-bold text-white">{i + 1}</span>{s}</li>)}
               </ol>
               <p className="caption mt-4">실거주는 교통·학군·인프라와 가격 경쟁력을, 투자는 가격 경쟁력·거래 활발도·안정성을 더 중시합니다. 상승률은 상한을 둔 일부 가중치로만 반영해 단순 상승률 순위가 되지 않도록 설계했습니다.</p>
               <button className="btn btn-mint mt-4" onClick={submit}>기본 조건으로 바로 추천받기</button>

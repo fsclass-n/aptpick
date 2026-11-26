@@ -20,7 +20,7 @@ export default function AdminLayout() {
   const { dark, toggle } = useDashboardTheme()
   return (
     <div className={dark ? 'dark' : ''}>
-      <div className="min-h-[calc(100vh-64px)] bg-slate-100 dark:bg-navy-950 dark:text-slate-200">
+      <div className="min-h-[calc(100vh-72px)] bg-slate-100 dark:bg-navy-950 dark:text-slate-200">
         <div className="container-x grid gap-6 py-6 lg:grid-cols-12">
           <aside className="lg:col-span-3 xl:col-span-2">
             <div className="card p-3 lg:sticky lg:top-24">

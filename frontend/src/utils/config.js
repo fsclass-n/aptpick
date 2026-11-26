@@ -11,6 +11,10 @@ export const LINKS = {
   web: 'https://aptpick.onrender.com',
   api: 'https://aptpick-api.onrender.com/docs',
   aws: 'https://aptpick.duckdns.org',
+  // SNS 채널: 개설 후 주소 입력 (빈 값이면 푸터에 '준비 중' 으로 표시)
+  instagram: '',
+  youtube: '',
+  blog: '',
 }
 
 export const PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/

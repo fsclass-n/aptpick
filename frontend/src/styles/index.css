@@ -4,115 +4,144 @@
 /* 데이터 분석·관리자 화면은 상위 요소에 .dark 를 부여해 선택적으로 다크 테마 적용 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 디자인 콘셉트: "Living Editorial" — 웜 아이보리 바탕 · 잉크 차콜 · 클레이(테라코타) 포인트 · 세이지 보조 */
 @theme {
   /* 타이포그래피: 제목 SUIT / 본문 Pretendard (웹 폰트 2종) */
   --font-display: "SUIT Variable", "SUIT", "Pretendard Variable", system-ui, sans-serif;
   --font-sans: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui, -apple-system, sans-serif;
 
-  /* Primary: 신뢰감을 주는 딥 블루 */
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #dce7ff;
-  --color-brand-200: #bcd0ff;
-  --color-brand-300: #8fb0fa;
-  --color-brand-400: #5b86f0;
-  --color-brand-500: #3563e3;
-  --color-brand-600: #1f4bc9;
-  --color-brand-700: #1a3da3;
-  --color-brand-800: #172f7a;
-  --color-brand-900: #13245a;
-  /* Secondary: 네이비 */
-  --color-navy-600: #2a3f6e;
-  --color-navy-700: #1b3160;
-  --color-navy-800: #112347;
-  --color-navy-900: #0b1730;
-  --color-navy-950: #070f22;
-  /* Accent: 민트 */
-  --color-mint-50: #ecfdf9;
-  --color-mint-100: #ccfbef;
-  --color-mint-300: #5eead4;
-  --color-mint-400: #2dd4bf;
-  --color-mint-500: #14b8a6;
-  --color-mint-600: #0d9488;
-  /* 의미 색상: 상승 레드 · 하락 블루 · 보합 그레이 · 추천 그린 · 주의 오렌지 */
-  --color-up: #e11d48;
-  --color-up-soft: #fff1f3;
-  --color-down: #2563eb;
-  --color-down-soft: #eff5ff;
-  --color-flat: #64748b;
-  --color-pick: #16a34a;
-  --color-pick-soft: #ecfdf3;
-  --color-warn: #ea580c;
-  --color-warn-soft: #fff4ec;
+  /* Primary: 클레이 (주거·온기를 상징하는 테라코타) */
+  --color-brand-50: #fbf4ef;
+  --color-brand-100: #f6e5d9;
+  --color-brand-200: #edc9b0;
+  --color-brand-300: #e1a47f;
+  --color-brand-400: #d48156;
+  --color-brand-500: #c2653a;
+  --color-brand-600: #a9522c;
+  --color-brand-700: #8a4224;
+  --color-brand-800: #6c3520;
+  --color-brand-900: #4f281a;
+  /* Secondary: 잉크 차콜 (기존 navy 토큰명 유지) */
+  --color-navy-600: #4a4541;
+  --color-navy-700: #35312e;
+  --color-navy-800: #252220;
+  --color-navy-900: #1a1816;
+  --color-navy-950: #100f0e;
+  /* Accent: 세이지 그린 (기존 mint 토큰명 유지) */
+  --color-mint-50: #f1f5ef;
+  --color-mint-100: #e0eadb;
+  --color-mint-300: #b3caa8;
+  --color-mint-400: #8fae82;
+  --color-mint-500: #6a8f5d;
+  --color-mint-600: #547449;
+  /* slate 를 웜 그레이로 재정의 → 기존 화면 전반의 회색 톤을 아이보리 계열로 통일 */
+  --color-slate-50: #faf8f5;
+  --color-slate-100: #f3efe9;
+  --color-slate-200: #e6dfd4;
+  --color-slate-300: #d3cabd;
+  --color-slate-400: #a69c8f;
+  --color-slate-500: #7d7368;
+  --color-slate-600: #5f574e;
+  --color-slate-700: #4a433c;
+  --color-slate-800: #2f2a25;
+  --color-slate-900: #1e1a17;
+  /* 웜 뉴트럴 */
+  --color-ivory: #f8f5f0;
+  --color-sand: #efe9e0;
+  --color-line: #e6dfd4;
+  /* 의미 색상: 상승 레드 · 하락 블루 · 보합 그레이 · 추천 그린 · 주의 앰버 */
+  --color-up: #d92d4a;
+  --color-up-soft: #fdf0f2;
+  --color-down: #2f62d8;
+  --color-down-soft: #eff4ff;
+  --color-flat: #78716c;
+  --color-pick: #3f7a4f;
+  --color-pick-soft: #eef5ef;
+  --color-warn: #b25b07;
+  --color-warn-soft: #fdf5e6;
 
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.06);
-  --shadow-float: 0 12px 40px rgb(15 23 42 / 0.16);
-  --animate-fade-up: fade-up 0.5s ease both;
+  --shadow-card: 0 1px 2px rgb(40 30 20 / 0.03), 0 2px 10px rgb(40 30 20 / 0.04);
+  --shadow-float: 0 18px 48px rgb(30 22 14 / 0.16);
+  --animate-fade-up: fade-up 0.6s cubic-bezier(.2,.7,.2,1) both;
   --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-ken: ken 18s ease-out both;
 
   @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes shimmer {
     from { background-position: -400px 0; }
     to { background-position: 400px 0; }
   }
+  @keyframes ken {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+  }
 }
 
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-  body { @apply bg-slate-50 font-sans text-[16px] leading-relaxed text-slate-800 antialiased; }
-  h1, h2, h3, h4 { @apply font-display tracking-tight text-slate-900; }
+  body { @apply bg-ivory font-sans text-[16px] leading-relaxed text-stone-800 antialiased; }
+  h1, h2, h3, h4 { @apply font-display tracking-tight text-navy-900; }
   .dark h1, .dark h2, .dark h3, .dark h4 { @apply text-white; }
   ::selection { @apply bg-brand-200 text-brand-900; }
   :focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
   input, select, textarea, button { font: inherit; }
 }
 
-/* 타이포그래피 스케일 (H1 32 · H2 24 · H3 20 · Body 16 · Caption 13) */
-@utility h1 { @apply font-display text-[26px] leading-tight font-extrabold md:text-[32px]; }
-@utility h2 { @apply font-display text-[22px] leading-snug font-bold md:text-[24px]; }
+/* 타이포그래피 스케일 (Display 56 · H1 34 · H2 26 · H3 20 · Body 16 · Caption 13) */
+@utility display { @apply font-display text-[34px] leading-[1.15] font-extrabold tracking-[-0.03em] md:text-[56px]; }
+@utility h1 { @apply font-display text-[26px] leading-tight font-extrabold tracking-[-0.02em] md:text-[34px]; }
+@utility h2 { @apply font-display text-[22px] leading-snug font-bold tracking-[-0.02em] md:text-[26px]; }
 @utility h3 { @apply font-display text-[18px] leading-snug font-bold md:text-[20px]; }
-@utility caption { @apply text-[13px] leading-normal text-slate-500 dark:text-slate-400; }
+@utility caption { @apply text-[13px] leading-normal text-stone-500 dark:text-stone-400; }
 @utility num { font-variant-numeric: tabular-nums; }
 
 /* 12컬럼 그리드 컨테이너 (Desktop ≥1280 · Tablet ≥768 · Mobile ≤767) */
-@utility container-x { @apply mx-auto w-full max-w-[1280px] px-4 md:px-6 xl:px-8; }
-@utility section-y { @apply py-10 md:py-14; }
+@utility container-x { @apply mx-auto w-full max-w-[1320px] px-5 md:px-8 xl:px-10; }
+@utility section-y { @apply py-14 md:py-20; }
 @utility grid-12 { @apply grid grid-cols-4 gap-4 md:grid-cols-8 md:gap-6 xl:grid-cols-12; }
 
 @utility card {
-  @apply rounded-2xl border border-slate-200/80 bg-white shadow-card dark:border-navy-700 dark:bg-navy-900;
+  @apply rounded-2xl border border-line bg-white shadow-card dark:border-navy-700 dark:bg-navy-900;
 }
-@utility eyebrow { @apply text-[13px] font-semibold tracking-wide text-brand-600 uppercase dark:text-mint-400; }
+@utility eyebrow { @apply text-[12px] font-bold tracking-[0.18em] text-brand-600 uppercase dark:text-brand-300; }
 @utility input {
-  @apply h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-[15px] text-slate-800 transition
-    placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 focus:outline-none
-    disabled:bg-slate-100 dark:border-navy-600 dark:bg-navy-800 dark:text-slate-100 dark:focus:ring-brand-900;
+  @apply h-11 w-full rounded-xl border border-line bg-white px-3 text-[15px] text-stone-800 transition
+    placeholder:text-stone-400 focus:border-navy-900 focus:ring-4 focus:ring-stone-200/70 focus:outline-none
+    disabled:bg-stone-100 dark:border-navy-600 dark:bg-navy-800 dark:text-stone-100 dark:focus:ring-navy-700;
 }
-@utility label { @apply mb-1.5 block text-[13px] font-semibold text-slate-600 dark:text-slate-300; }
+@utility label { @apply mb-1.5 block text-[13px] font-semibold text-stone-600 dark:text-stone-300; }
 @utility btn {
-  @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold whitespace-nowrap
+  @apply inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold whitespace-nowrap
     transition select-none disabled:cursor-not-allowed disabled:opacity-50;
 }
-@utility btn-primary { @apply bg-brand-600 text-white shadow-sm hover:bg-brand-700 active:bg-brand-800; }
+@utility btn-primary { @apply bg-navy-900 text-white hover:bg-navy-700 active:bg-navy-800 dark:bg-brand-500 dark:hover:bg-brand-600; }
+@utility btn-accent { @apply bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700; }
 @utility btn-secondary {
-  @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-navy-600 dark:bg-navy-800
-    dark:text-slate-200 dark:hover:bg-navy-700;
+  @apply border border-line bg-white text-stone-700 hover:border-stone-400 hover:text-navy-900 dark:border-navy-600 dark:bg-navy-800
+    dark:text-stone-200 dark:hover:bg-navy-700;
 }
-@utility btn-ghost { @apply text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-navy-800; }
-@utility btn-mint { @apply bg-mint-500 text-white hover:bg-mint-600; }
-@utility btn-sm { @apply h-9 rounded-lg px-3 text-[14px]; }
+@utility btn-ghost { @apply text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-navy-800; }
+@utility btn-mint { @apply bg-brand-500 text-white hover:bg-brand-600; }
+@utility btn-sm { @apply h-9 px-4 text-[14px]; }
 @utility chip {
   @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px] leading-5 font-semibold whitespace-nowrap;
 }
 @utility skeleton {
-  background: linear-gradient(90deg, rgb(226 232 240) 0px, rgb(241 245 249) 120px, rgb(226 232 240) 240px);
+  background: linear-gradient(90deg, rgb(237 231 222) 0px, rgb(246 242 236) 120px, rgb(237 231 222) 240px);
   background-size: 800px 100%;
-  @apply animate-shimmer rounded-lg;
+  @apply animate-shimmer rounded-xl;
 }
 @utility scrollbar-none { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
-
+/* 이미지 위 텍스트 가독성 그라데이션 */
+@utility scrim { background: linear-gradient(180deg, rgb(16 15 14 / 0) 35%, rgb(16 15 14 / 0.72) 100%); }
+/* 링크 밑줄 호버 (에디토리얼 내비) */
+@utility link-line {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; transition: background-size .25s;
+  &:hover, &.active { background-size: 100% 1.5px; }
+}
 /* 표 */
 @utility table-base {
   @apply w-full text-left text-[14px];
@@ -147,10 +176,10 @@
   content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
   border: 6px solid transparent; border-bottom: 0; border-top-color: inherit;
 }
-.apt-pin.active { transform: translate(-50%, -100%) scale(1.12); outline: 3px solid #2dd4bf; z-index: 999; }
+.apt-pin.active { transform: translate(-50%, -100%) scale(1.12); outline: 3px solid #1a1816; z-index: 999; }
 .apt-cluster {
   transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 76px; height: 76px; border-radius: 999px; background: rgb(31 75 201 / .88); color: #fff;
+  width: 76px; height: 76px; border-radius: 999px; background: rgb(26 24 22 / .88); color: #fff;
   border: 3px solid rgb(255 255 255 / .9); box-shadow: 0 6px 18px rgb(15 23 42 / .3); font: 700 13px/1.2 var(--font-sans);
   text-align: center; cursor: pointer;
 }
@@ -159,4 +188,4 @@
   transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 999px; display: flex; align-items: center;
   justify-content: center; color: #fff; font-size: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .25);
 }
-.leaflet-container { font-family: var(--font-sans); background: #e8eef7; }
+.leaflet-container { font-family: var(--font-sans); background: #ece6dc; }

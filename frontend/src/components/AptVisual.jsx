@@ -1,10 +1,27 @@
-// 매물 이미지가 없을 때 사용하는 단지 일러스트 (단지 id 로 색·층 구성 결정 — 실제 사진 아님)
+// 매물 이미지가 없을 때 사용하는 단지 참고 이미지 (Unsplash 연출 사진 · 실제 단지 사진 아님)
+// 이미지 로드 실패 시 단지 id 로 색·층 구성을 결정하는 SVG 일러스트로 대체
+import { useState } from 'react'
+import { complexImage } from '../utils/images'
 const PALETTES = [
-  ['#dce7ff', '#1f4bc9', '#8fb0fa'], ['#ccfbef', '#0d9488', '#5eead4'], ['#e0e7ff', '#3730a3', '#a5b4fc'],
-  ['#fef3c7', '#b45309', '#fcd34d'], ['#fce7f3', '#be185d', '#f9a8d4'], ['#e2e8f0', '#1b3160', '#94a3b8'],
+  ['#f6e5d9', '#a9522c', '#e1a47f'], ['#e0eadb', '#547449', '#b3caa8'], ['#efe9e0', '#35312e', '#a69c8f'],
+  ['#fdf5e6', '#b25b07', '#f2c46d'], ['#f3e8e4', '#8a4224', '#d9a79a'], ['#e6e9ec', '#3b4a5a', '#9aa7b4'],
 ]
 
-export default function AptVisual({ id = 1, floors = 20, className = '', label }) {
+export default function AptVisual({ id = 1, floors = 20, className = '', label = '참고 이미지', photo = true, width = 800 }) {
+  const [failed, setFailed] = useState(false)
+  if (photo && !failed) {
+    return (
+      <div className={`relative overflow-hidden bg-sand ${className}`}>
+        <img src={complexImage(id, width)} alt="" loading="lazy" onError={() => setFailed(true)}
+          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
+        {label && <span className="absolute bottom-2 left-2 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">{label}</span>}
+      </div>
+    )
+  }
+  return <Illustration id={id} floors={floors} className={className} label={label} />
+}
+
+function Illustration({ id, floors, className, label }) {
   const [bg, main, sub] = PALETTES[id % PALETTES.length]
   const towers = 2 + (id % 3)
   const h = Math.min(1, (floors || 15) / 35)

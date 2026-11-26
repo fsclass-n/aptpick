@@ -1,6 +1,7 @@
 import { Brain, ChartLine, Database, LayoutDashboard, Server } from 'lucide-react'
 import { Badge, Card, PageHeader } from '../components/ui'
 import { LINKS } from '../utils/config'
+import { IMG } from '../utils/images'
 
 const TEAM = [
   { name: '박미금', role: '조장 · PM / Frontend / UI·UX', icon: LayoutDashboard, tasks: ['프로젝트 일정·업무 관리, PR 리뷰·최종 병합', 'React(Vite)·Tailwind v4 디자인 시스템', '검색·지도·추천·대시보드 화면 및 반응형 GNB'] },
@@ -13,7 +14,7 @@ const STACK = ['React 19', 'Vite', 'Tailwind CSS v4', 'React Router', 'Axios', '
 export default function About() {
   return (
     <>
-      <PageHeader eyebrow="About" title="프로젝트 안내" desc="aptpick 은 공공 부동산 데이터와 AI 분석 기술을 결합해 주거 선택과 시장 판단을 돕는 B2C·B2B 부동산 플랫폼입니다." />
+      <PageHeader eyebrow="About" image={IMG.park} title="프로젝트 안내" desc="aptpick 은 공공 부동산 데이터와 AI 분석 기술을 결합해 주거 선택과 시장 판단을 돕는 B2C·B2B 부동산 플랫폼입니다." />
       <div className="container-x space-y-8 py-8">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {TEAM.map(({ name, role, icon: Icon, tasks }) => (

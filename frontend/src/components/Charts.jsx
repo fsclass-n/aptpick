@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { pct } from '../utils/format'
 
-export const COLORS = { brand: '#1f4bc9', mint: '#14b8a6', navy: '#1b3160', up: '#e11d48', down: '#2563eb', flat: '#94a3b8', amber: '#f59e0b', violet: '#7c3aed' }
+export const COLORS = { brand: '#c2653a', mint: '#6a8f5d', navy: '#35312e', up: '#d92d4a', down: '#2f62d8', flat: '#a69c8f', amber: '#d9a03f', violet: '#7a6cb0' }
 const SERIES = [COLORS.brand, COLORS.mint, COLORS.amber, COLORS.violet, COLORS.up]
 const axis = { tick: { fontSize: 12, fill: 'currentColor' }, tickLine: false, axisLine: false }
 

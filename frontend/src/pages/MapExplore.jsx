@@ -11,8 +11,8 @@ import { DEAL_LABEL, DEAL_TYPES, INFRA } from '../utils/config'
 import { eok, num, won } from '../utils/format'
 
 const CLUSTER_ZOOM = 12
-const tierColor = (ppm2) => (!ppm2 ? '#94a3b8' : ppm2 < 800 ? '#0d9488' : ppm2 < 1300 ? '#3563e3' : ppm2 < 2000 ? '#1a3da3' : '#6d28d9')
-const LEGEND = [['~800', '#0d9488'], ['~1,300', '#3563e3'], ['~2,000', '#1a3da3'], ['2,000~', '#6d28d9']]
+const tierColor = (ppm2) => (!ppm2 ? '#a69c8f' : ppm2 < 800 ? '#547449' : ppm2 < 1300 ? '#c2653a' : ppm2 < 2000 ? '#8a4224' : '#1a1816')
+const LEGEND = [['~800', '#547449'], ['~1,300', '#c2653a'], ['~2,000', '#8a4224'], ['2,000~', '#1a1816']]
 
 export default function MapExplore() {
   const [sp, setSp] = useSearchParams()
@@ -55,7 +55,7 @@ export default function MapExplore() {
   const pick = (c) => { setSelected(c.id); setFocus({ center: [c.lat, c.lng], zoom: Math.max(15, b?.zoom || 15) }); setView('map') }
 
   return (
-    <div className="flex h-[calc(100dvh-64px)] flex-col lg:flex-row">
+    <div className="flex h-[calc(100dvh-72px)] flex-col lg:flex-row">
       <aside className={`flex min-h-0 flex-col border-r border-slate-200 bg-white lg:w-[380px] ${view === 'list' ? 'flex-1' : 'hidden lg:flex'}`}>
         <div className="space-y-3 border-b border-slate-100 p-4">
           <div className="flex gap-2">
