@@ -1,0 +1,13 @@
+# 루트 Dockerfile (백엔드 이미지) 빌드 컨텍스트 최소화
+.git
+.venv
+.env
+.env.*
+deploy/*.env
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+frontend/dist
+data/raw
+data/processed
+docs
