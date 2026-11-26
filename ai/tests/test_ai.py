@@ -2,6 +2,7 @@ import os
 import tempfile
 
 os.environ.update({"DATABASE_URL": f"sqlite:///{os.path.join(tempfile.mkdtemp(), 'ai.db')}", "SEED_SAMPLE_DATA": "true",
+                   "AI_RESULTS_DIR": tempfile.mkdtemp(), "WARMUP_ON_STARTUP": "false",
                    "GEMINI_API_KEY": "", "DATA_GO_KR_API_KEY": ""})
 
 import pandas as pd  # noqa: E402

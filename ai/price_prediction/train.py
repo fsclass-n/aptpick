@@ -7,6 +7,7 @@
 """
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -14,7 +15,7 @@ import numpy as np
 
 from .._backend import session
 
-RESULTS = Path(__file__).resolve().parents[1] / "evaluation" / "results"
+RESULTS = Path(os.getenv("AI_RESULTS_DIR") or Path(__file__).resolve().parents[1] / "evaluation" / "results")
 
 
 def dataset(db):

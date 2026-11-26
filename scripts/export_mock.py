@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.database import SessionLocal  # noqa: E402
 from app.models import Infrastructure  # noqa: E402
-from app.main import _warm_up, app  # noqa: E402
+from app.main import _warm_up, app  # noqa: E402  (WARMUP_ON_STARTUP=false → 기동 시 데이터 동기 적재)
 from app.services import recommendation  # noqa: E402
 
 OUT = ROOT / "frontend" / "src" / "mock" / "snapshot.json"

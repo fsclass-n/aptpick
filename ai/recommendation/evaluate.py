@@ -8,13 +8,14 @@
 결과: ai/evaluation/results/recommendation_eval.json
 """
 import json
+import os
 from pathlib import Path
 
 import numpy as np
 
 from .._backend import session
 
-RESULTS = Path(__file__).resolve().parents[1] / "evaluation" / "results"
+RESULTS = Path(os.getenv("AI_RESULTS_DIR") or Path(__file__).resolve().parents[1] / "evaluation" / "results")
 K = 10
 
 

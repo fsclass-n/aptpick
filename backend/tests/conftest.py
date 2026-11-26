@@ -14,6 +14,9 @@ os.environ.update({
     "SEED_SAMPLE_DATA": "true",
     "WARMUP_ON_STARTUP": "false",
     "RATE_LIMIT_PER_MINUTE": "100000",
+    "TIDB_HOST": "",
+    # 로컬 .env 의 실제 키가 테스트에 섞이지 않도록 명시적으로 비움 (load_dotenv 는 기존 값을 덮어쓰지 않음)
+    **{f"{p}_CLIENT_{k}": "" for p in ("GOOGLE", "NAVER", "KAKAO") for k in ("ID", "SECRET")},
 })
 
 from fastapi.testclient import TestClient  # noqa: E402
